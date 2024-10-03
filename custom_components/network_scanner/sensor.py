@@ -59,10 +59,20 @@ class NetworkScanner(Entity):
     def parse_mac_mapping(self, mapping_string):
         """Parse the MAC mapping string into a dictionary."""
         mapping = {}
-        for line in mapping_string.split('\n'):
-            parts = line.split(';')
-            if len(parts) >= 3:
-                mapping[parts[0].lower()] = (parts[1], parts[2])
+        try:
+            with open('known_netrok.json', 'r') as file:
+                known_devices = file.readlines()
+                for line in known_devices:
+                    parts = line.strip().split(';')
+                    if len(parts) >= 3:
+                        mapping[parts.lower()] = (parts, parts)
+        except FileNotFoundError:
+            _LOGGER.error("known_netrok.json file not found")
+    
+        #for line in mapping_string.split('\n'):
+        #    parts = line.split(';')
+        #    if len(parts) >= 3:
+        #        mapping[parts[0].lower()] = (parts[1], parts[2])
         return mapping
 
     def get_device_info_from_mac(self, mac_address):
